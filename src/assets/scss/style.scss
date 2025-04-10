@@ -1,0 +1,340 @@
+@charset "utf-8";
+
+@use "variables" as v;
+@use "reset";
+@use "base";
+
+/////////////// height ///////////////
+$head_height:48px;
+$foot_height:48px;
+$main_height:calc(100vh - (#{$head_height} + #{$foot_height}));
+
+/////////////// width ///////////////
+$result_width:400px;
+$tmb_width:120px;
+
+/////////////// z-index ///////////////
+$z-indexs:(
+  'arrow_btn':1000000,
+  'viewer':100000,
+);
+
+button{
+  cursor: pointer;
+
+  &:disabled{
+    pointer-events: none!important;
+  }
+}
+/* header */
+#head{
+  height: $head_height;
+  padding:0.5rem;
+  display: flex;
+}
+
+#search_area{
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  form{
+    label{
+      > span{
+        position: absolute;
+        top: -10000px;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+      }
+    }
+  }
+}
+#search_box{
+  padding:0.35rem 0.5rem;
+  background: v.$yellow;
+  border: 1px solid v.$black;
+}
+#search_btn{
+  background:v.$black ;
+  color: #ffffff;
+  margin: 0 0.25rem;
+  padding: 0.25rem 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  border: 1px solid v.$black;
+
+  &:focus{
+    border: 1px solid #ffffff;
+  }
+}
+#msg{
+  color: v.$red;
+}
+
+#page_area{
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  padding-right: 48px;
+  margin-left: auto;
+
+  span{
+    padding: 0 0.5em;
+  }
+}
+#page_box{
+  text-align: center;
+  width: 3em;
+  background: v.$yellow;
+  border: 1px solid v.$black;
+  padding: 0.25em 0.5em;
+}
+#to_page{
+  position: relative;
+  background: transparent;
+  border-color: transparent;
+
+  &:focus{
+    outline: none;
+  }
+  &::before{
+    position: absolute;
+    display: inline-block;
+    content: "";
+    background: url(../images/icon/go.png);
+    top:50%;
+    left: 6px;
+    transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+  }
+
+  &:focus-within{
+    &::before{
+      outline: 1px solid #ffffff;
+      outline-offset: -3px;
+      border-radius: 2px;
+    }
+  }
+}
+
+
+
+#wrap{
+  width: 100vw;
+  height: $main_height;
+  display: flex;
+
+  #side{
+    width: $tmb_width;
+    height: $main_height;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: v.$gray;
+  }
+  #tmb_area {
+    div{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+
+      dt{
+        padding: 0.25rem;
+      }
+
+      &:hover{
+        background: v.$black;
+        opacity: 0.6;
+        transition: .5s;
+
+        dd{
+          color: #ffffff;
+        }
+      }
+
+      &.current_img {
+        background: v.$yellow;
+        pointer-events: none;
+      }
+    }
+  }
+  #result_area{
+    display: none;
+
+    span{
+      display: inline-block;
+      padding:0.5em;
+      margin: 0.5em 0;
+      line-height: 2em;
+      cursor: pointer;
+
+      &:hover{
+        text-decoration: underline;
+      }
+      &::before{
+        content: "⇒";
+      }
+      &.selected{
+        color:v.$red;
+      }
+    }
+  }
+
+  #viewer-image{
+    z-index:map-get( $z-indexs, viewer ) ;
+    width: calc(100vw - $tmb_width);
+    height: $main_height;
+    background: v.$black;
+  }
+
+  #left_arrow{
+    position: fixed;
+    top:$head_height;
+    left: $tmb_width;
+    width: 44px;
+    height: $main_height;
+    z-index:map-get( $z-indexs, arrow_btn ) ;
+    background: transparent;
+    border-color: transparent;
+
+    &:focus{
+      outline: none;
+    }
+
+    &::before{
+      position: absolute;
+      content: url(../images/icon/leftarrow.svg);
+      top:50%;
+    }
+
+    &:disabled{
+      &::before{
+        @extend %inactive;
+      }
+    }
+  }
+  #right_arrow{
+    position: fixed;
+    top:$head_height;
+    right: 0;
+    width: 44px;
+    height:$main_height;
+    z-index:map-get( $z-indexs, arrow_btn ) ;
+    background: transparent;
+    border-color: transparent;
+
+    &:focus{
+      outline: none;
+    }
+    &::before{
+      position: absolute;
+      content: url(../images/icon/rightarrow.svg);
+      top:50%;
+      right: 22px;
+    }
+
+    &:disabled{
+      &::before{
+        @extend %inactive;
+      }
+    }
+  }
+
+  &.result_opn{
+    #side{
+      width: $result_width;
+      animation: fadeIn 0.3s ease-in 0s forwards;
+    }
+    #tmb_area{
+      display: none;
+    }
+    #result_area{
+      display: block;
+      animation: fadeIn 0.3s ease-in 0s forwards;
+    }
+
+    #viewer-image{
+      width: calc(100vw - $result_width);
+    }
+
+    #left_arrow{
+      left: $result_width;
+    }
+  }
+}
+
+/*オーバーレイ*/
+.current-ocr{
+  border: 1px solid v.$red;
+}
+
+
+%inactive{
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+
+@keyframes fadeIn {
+  0%{opacity: 0;}
+  50%{opacity: 0.5;}
+  100%{opacity: 1;}
+}
+
+
+/* footer */
+#foot{
+  height: $foot_height;
+}
+#operation_buttons{
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+  padding:4px 0.5rem;
+}
+
+/*icon*/
+$icons :(
+  'previous':'rightbtn' ,
+  'next':'leftbtn' ,
+  'fullscreen':'fullscreen' ,
+  'reset':'reset' ,
+  'zoom-in':'zoom-in' ,
+  'zoom-out':'zoom-out' ,
+  'rotate-left':'rotate-left' ,
+  'rotate-right':'rotate-right'
+);
+@each $name, $icon in $icons{
+  @each $name, $icon in $icons{
+    ##{$name}{
+      position: relative;
+      width: 40px;
+      background: transparent;
+      border-color: transparent;
+
+      &::before{
+        position: absolute;
+        display: inline-block;
+        content: "";
+        top:0;
+        left: 0;
+        width: 32px;
+        height: 32px;
+        background: url(../images/icon/#{$icon}.png);
+        background-size: contain;
+      }
+
+      &:hover{
+        &::before{
+          opacity: 0.8;
+          transition: .5s;
+        }
+      }
+    }
+  }
+}
